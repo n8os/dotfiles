@@ -26,7 +26,9 @@ fi
 
 unset rc
 
-export PS1="\[\033[38;5;48m\]\u\[$(tput sgr0)\]@\h:\[$(tput sgr0)\]\[\033[38;5;6m\][\w]\[$(tput sgr0)\]:\t\n>\\$ \[$(tput sgr0)\]"
+# custom prompt
+# example: 04:30 ~$
+export PS1='\[\e[38;5;244m\]\t\[\e[0m\] \[\e[38;5;40m\]\w\[\e[38;5;244m\]\$\[\e[0m\] '
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
