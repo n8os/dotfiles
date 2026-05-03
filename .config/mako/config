@@ -7,10 +7,10 @@ border-size=2
 border-color=#88c0d0
 border-radius=3
 icons=1
-icon-path=/usr/share/icons/Adwaita
+icon-path=Papirus-Dark/
 max-icon-size=64
 default-timeout=5000
-font=monaco 12
+font=Monego 20
 
 [urgency=low]
 border-color=#cccccc

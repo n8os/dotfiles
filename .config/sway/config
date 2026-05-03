@@ -14,25 +14,30 @@ set $down j
 set $up k
 set $right l
 # Your preferred terminal emulator
-set $term foot
+set $term gnome-terminal
 # Your preferred application launcher
-# Note: pass the final command to swaymsg so that the resulting window can be opened
-# on the original workspace that the command was run on.
-#set $menu dmenu_path | dmenu | xargs swaymsg exec --
-set $menu fuzzel | xargs swaymsg exec --
-
-include /etc/sway/config-vars.d/*
+set $menu fuzzel
 
 ### Output configuration
 #
 # Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
-output * bg /usr/share/backgrounds/f37/default/f37-01-night.png  fill
+# output * bg /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
+output * bg /home/n8/Downloads/space.png fill
 #
 # Example configuration:
 #
 #   output HDMI-A-1 resolution 1920x1080 position 1920,0
-#
+#R
 # You can get the names of your outputs by running: swaymsg -t get_outputs
+set $primary DP-4 eDP-1
+output DP-4 resolution 1920x1080@60Hz position 0,0 transform 90
+output DP-3 resolution 1920x1080@144Hz position 1080,0
+output DP-5 resolution 1920x1080@60Hz position 3000,0
+focus output DP-3
+
+workspace 1 output $primary
+workspace 2 output DP-3
+workspace 3 output DP-5
 
 ### Idle configuration
 #
@@ -40,7 +45,7 @@ output * bg /usr/share/backgrounds/f37/default/f37-01-night.png  fill
 #
 # exec swayidle -w \
 #          timeout 300 'swaylock -f -c 000000' \
-#          timeout 600 'swaymsg "output * dpms off"' resume 'swaymsg "output * dpms on"' \
+#          timeout 600 'swaymsg "output * power off"' resume 'swaymsg "output * power on"' \
 #          before-sleep 'swaylock -f -c 000000'
 #
 # This will lock your screen after 300 seconds of inactivity, then turn off
@@ -54,24 +59,27 @@ output * bg /usr/share/backgrounds/f37/default/f37-01-night.png  fill
 #   input "2:14:SynPS/2_Synaptics_TouchPad" {
 #       dwt enabled
 #       tap enabled
-#       natural_scroll enabled
+#       natural_scroll disabled
 #       middle_emulation enabled
 #   }
 #
 # You can get the names of your inputs by running: swaymsg -t get_inputs
 # Read `man 5 sway-input` for more information about this section.
 
-   input "2:14:ETPS/2_Elantech_Touchpad" {
-       dwt enabled
-       tap enabled
-       #natural_scroll enabled
-       middle_emulation enabled
-   }
+input "type:touchpad" {
+    dwt enabled
+    tap enabled
+    natural_scroll disabled
+    middle_emulation enabled
+}
+
+bindgesture swipe:right workspace prev
+bindgesture swipe:left workspace next
 
 ### Key bindings
 #
 # Basics:
-#
+#s
     # Start a terminal
     bindsym $mod+Return exec $term
 
@@ -79,7 +87,7 @@ output * bg /usr/share/backgrounds/f37/default/f37-01-night.png  fill
     bindsym $mod+Shift+q kill
 
     # Start your launcher
-    bindsym $mod+Space exec $menu
+    bindsym $mod+space exec $menu
 
     # Drag floating windows by holding down $mod and left mouse button.
     # Resize them with right mouse button + $mod.
@@ -93,6 +101,11 @@ output * bg /usr/share/backgrounds/f37/default/f37-01-night.png  fill
 
     # Exit sway (logs you out of your Wayland session)
     bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -B 'Yes, exit sway' 'swaymsg exit'
+
+    # Power button
+    bindsym --to-code    XF86PowerOff      exec notify-send 'Love you T, cat 😻' '🐈'
+
+
 #
 # Moving around:
 #
@@ -150,13 +163,13 @@ output * bg /usr/share/backgrounds/f37/default/f37-01-night.png  fill
     # You can "split" the current object of your focus with
     # $mod+b or $mod+v, for horizontal and vertical splits
     # respectively.
-    #bindsym $mod+b splith
-    #bindsym $mod+v splitv
+    bindsym $mod+b splith
+    bindsym $mod+v splitv
 
     # Switch the current container between different layout styles
-    #bindsym $mod+s layout stacking
-    #bindsym $mod+w layout tabbed
-    #bindsym $mod+e layout toggle split
+    bindsym $mod+s layout stacking
+    bindsym $mod+w layout tabbed
+    bindsym $mod+e layout toggle split
 
     # Make the current focus fullscreen
     bindsym $mod+f fullscreen
@@ -165,10 +178,10 @@ output * bg /usr/share/backgrounds/f37/default/f37-01-night.png  fill
     bindsym $mod+Shift+space floating toggle
 
     # Swap focus between the tiling area and the floating area
-    #bindsym $mod+space focus mode_toggle
+    bindsym $mod+d focus mode_toggle
 
     # Move focus to the parent container
-    #bindsym $mod+a focus parent
+    bindsym $mod+a focus parent
 #
 # Scratchpad:
 #
@@ -176,11 +189,11 @@ output * bg /usr/share/backgrounds/f37/default/f37-01-night.png  fill
     # You can send windows there and get them back later.
 
     # Move the currently focused window to the scratchpad
-    #bindsym $mod+Shift+minus move scratchpad
+    bindsym $mod+Shift+minus move scratchpad
 
     # Show the next scratchpad window or hide the focused scratchpad window.
     # If there are multiple scratchpad windows, this command cycles through them.
-    #bindsym $mod+minus scratchpad show
+    bindsym $mod+minus scratchpad show
 #
 # Resizing containers:
 #
@@ -205,16 +218,28 @@ mode "resize" {
     bindsym Escape mode "default"
 }
 bindsym $mod+r mode "resize"
-
 #
-
-# Brightness
+# Utilities:
 #
+    # Special keys to adjust volume via PulseAudio
+    # bindsym --locked XF86AudioMute exec pactl set-sink-mute \@DEFAULT_SINK@ toggle
+    # bindsym --locked XF86AudioLowerVolume exec pactl set-sink-volume \@DEFAULT_SINK@ -5%
+    # bindsym --locked XF86AudioRaiseVolume exec pactl set-sink-volume \@DEFAULT_SINK@ +5%
+    bindsym --locked XF86AudioMicMute exec pactl set-source-mute \@DEFAULT_SOURCE@ toggle
+    # Special keys to adjust brightness via brightnessctl
+    # bindsym --locked XF86MonBrightnessDown exec brightnessctl set 5%-
+    # bindsym --locked XF86MonBrightnessUp exec brightnessctl set 5%+
+    # Special key to take a screenshot with grim
+    bindsym Print exec slurp | grim -g - 
+    bindsym $mod+Print exec grim
+
+    # Brightness
+    #
     bindsym --locked XF86MonBrightnessDown exec ~/bin/changeBrightness.sh set 5%-
     bindsym --locked XF86MonBrightnessUp exec ~/bin/changeBrightness.sh set 5%+
 
-# Audio
-# 
+    # Audio
+    # 
     bindsym --locked XF86AudioRaiseVolume exec ~/bin/changeVolume.sh +5%
     bindsym --locked XF86AudioLowerVolume exec ~/bin/changeVolume.sh -5%
     bindsym --locked XF86AudioMute exec ~/bin/changeVolume.sh toggle
@@ -223,37 +248,30 @@ bindsym $mod+r mode "resize"
    # bindsym XF86AudioNext exec playerctl next
    # bindsym XF86AudioPrev exec playerctl previous
 
-# Screenshot
-#
-    bindsym --locked Print exec ~/bin/screenshot.sh 
 
 #
 # Status Bar:
 #
 # Read `man 5 sway-bar` for more information about this section.
-#bar {
-#    position top
-#
-#    # When the status_command prints a new line to stdout, swaybar updates.
-#    # The default just shows the current date and time.
-#    status_command while date +'%Y-%m-%d %H:%M:%S'; do sleep 1; done
-#
-#    colors {
-#        statusline #ffffff
-#        background #323232
-#        inactive_workspace #32323200 #32323200 #5c5c5c
-#    }
-#    
-##    font "monaco regular 9"
-#}
+bar {
+    position top
+    # When the status_command prints a new line to stdout, swaybar updates.
+    # The default just shows the current date and time.
+    #status_command while date +'%Y-%m-%d %X'; do sleep 1; done
+    status_command i3status    
 
-default_border pixel 2
-
-
-# disable xwayland
-xwayland disable
-
-exec waybar
-exec mako
+    colors {
+        statusline #ffffff
+        background #323232
+        inactive_workspace #32323200 #32323200 #5c5c5c
+    }
+}
 
 include /etc/sway/config.d/*
+
+
+# startup stuff
+exec mako
+
+# No window title/decorations
+default_border none
